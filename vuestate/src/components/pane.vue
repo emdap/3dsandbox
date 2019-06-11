@@ -1,5 +1,5 @@
 <template>
-  <div :id="`pane${id}`" :style="paneStyle" :class="id == $store.state.activePane.id ? 'active' : 'default'">
+  <div :id="id" :style="paneStyle" :class="id == $store.state.activePane.id ? 'active' : 'default'">
     {{id}}
   </div>
 </template>
@@ -10,23 +10,13 @@ export default {
   name: 'Pane',
   mixins: [paneBase],
   mounted: function() {
-    this.setTypeDefaults()
-    this.setBackgrounds()
-    this.div = document.getElementById(`pane${this.id}`)
     this.setBaseDefaults()
+    this.setTypeDefaults()
+    this.setColors()
   },
   methods: {
     setTypeDefaults() {
-      this.paneAttributes.size = {
-        height: 100,
-        width: 100
-      }
-      this.paneAttributes.colors = {
-        red: 255,
-        green: 200,
-        blue: 150,
-        opacity: .9
-      }
+      this.paneAttributes.paneType = 'pane'
     }
   }
 }

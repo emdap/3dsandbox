@@ -5,7 +5,9 @@
       <button v-on:click="addPaneHolder">
         +
       </button>
-      <paneHolder v-for="(paneHolder, index) in $store.state.paneHolders" :key="index" :id="paneHolder.id" paneType="holder"/>
+      <paneHolder v-for="(paneHolder, index) in $store.state.paneHolders" :key="index" :id="paneHolder.id" :paneAttributes="paneHolder.paneAttributes" paneType="holder">
+        <pane v-for="(pane, index) in paneHolder.internalPanes" :id="pane.id" :key="index" :paneAttributes="pane.paneAttributes"/>
+      </paneHolder>
     </div>
   </div>
 </template>
@@ -13,40 +15,43 @@
 <script>
 // @ is an alias to /src
 import paneHolder from '@/components/paneHolder.vue'
+import pane from '@/components/pane.vue'
 import controller from '@/components/controller.vue'
 
 export default {
   name: 'home',
   components: {
     paneHolder,
+    pane,
     controller
-  },
-  mounted: function() {
-    // document.addEventListener('keydown', this.$store.commit('updateKeyDown', true))
-    // document.addEventListener('keyup', this.$store.commit('updateKeyDown', false))
-    // document.addEventListener('mousemove', function(e) {
-    //   if ($store.state.mouseDown) {
-    //     e.preventDefault()
-    //     mousePos = {
-    //       x: e.clientX,
-    //       y: e.clientY
-    //     }
-    //     $store.state.commit('updateMousePos', mousePos)
-    //   }
-    // })
   },
   methods: {
     addPaneHolder: function () {
       console.log('adding')
-      // const pane = {
-      //   id: this.$store.state.panes.length + 1,
-      //   holderId: 1
-      // }
-      const paneHolder = {
-        id: `holder${this.$store.state.paneHolders.length + 1}`,
-        internalPanes: []
+      const attributes =  {
+        rotations: {
+          x: 0,
+          y: 0,
+          z: 0,
+          spin: 0,
+          perspective: 600
+        },
+        size: {
+          height: 500,
+          width: 500
+        },
+        position: {
+          top: 0,
+          left: 0
+        },
+        colors: {
+          red: 250,
+          green: 250,
+          blue: 255,
+          opacity: 1
+        }
       }
-      this.$store.commit('addPaneHolder', paneHolder)
+      this.$store.commit('addPaneHolder', attributes)
     }
   }
 }

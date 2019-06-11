@@ -1,14 +1,32 @@
+<template>
+</template>
+
 <script>
 export default {
-  name: 'Pane',
+  name: 'PaneBase',
   props: {
-    id: Number
+    id: String,
+    paneAttributes: Object
   },
   data() {
       return {
         div: '',
-        internalPanes: [],
+        paneType: '',
         ctrlDown: false,
+        shiftDown: false,
+        altDown: false,
+        sizeDirection: {
+          x: 0,
+          y: 0
+        },
+        sizePos: {
+          x: 0,
+          y: 0
+        },
+        sizeStart: {
+          x: 0,
+          y: 0
+        },
         rotatePos: {
           x: 0,
           y: 0,
@@ -48,38 +66,21 @@ export default {
           border: '',
           transform: '',
           'line-height': ''
-        },
-        paneAttributes: {
-          id: 0,
-          rotations: {
-            x: 0,
-            y: 0,
-            z: 0,
-            spin: 0,
-            perspective: 0
-          },
-          size: {
-            height: 0,
-            width: 0
-          },
-          position: {
-            top: 0,
-            left: 0
-          },
-          colors: {
-            red: 0,
-            green: 0,
-            blue: 0,
-            opacity: 0
-          },
         }
     }
   },
   watch: {
+    sizeDirection: function() {
+      let h = this.paneAttributes.size.height + this.sizeDirection.y * 3
+      let w = this.paneAttributes.size.width + this.sizeDirection.x * 3
+      h = Math.max(h, 0)
+      w = Math.max(w, 0)
+      this.updateSize(h, w)
+    },
     mousePos: function() {
       const top = this.mousePos.y + this.mouseOffset.y
       const left = this.mousePos.x + this.mouseOffset.x
-      this.setLocation(top, left)
+      this.updatePosition(top, left)
     },
     rotatePos: function() {
       const xRot = this.angleStart.x + this.rotatePos.x - this.rotateStart.x
@@ -89,47 +90,65 @@ export default {
       // rotating after transforming or vice versa will have glitchy effect
       // due to rotating changing the location of the axis of which the transform takes place
       console.log(zDist)
-      this.setRotations(xRot, yRot, zDist, spin)
+      this.updateRotations(xRot, yRot, zDist, spin)
     }
   },
   methods: {
-    setBaseDefaults(paneType) {
-      console.log(this.div)
+    setBaseDefaults() {
+      this.div = document.getElementById(this.id)
+      console.log(this.paneAttributes)
+      console.log(this.id)
       this.setRotations()
       this.setSize()
-      this.setLocation(0,0)
+      this.setPosition()
       console.log('hello')
       this.div.addEventListener("dblclick", this.updateActive)
       this.div.addEventListener("mousedown", this.setOffset)
-      // this.div.addEventListener("mouseup", this.$store.commit('updateMouseDown', false))
-      this.div.addEventListener("mouseup", this.removeListener)
-      this.paneAttributes.id = this.id
+    },
+    updateSize(h, w) {
+      this.paneAttributes.size.height = h
+      this.paneAttributes.size.width = w
+      this.setSize()
     },
     setSize(){
-      this.paneStyle.width = `${this.paneAttributes.size.width}px`
       this.paneStyle.height = `${this.paneAttributes.size.height}px`
+      this.paneStyle.width = `${this.paneAttributes.size.width}px`
       this.paneStyle['line-height'] = `${this.paneAttributes.size.height}px`
     },
-    setRotations(sideRot, upRot, z, spin) {
+    updateRotations(sideRot, upRot, z, spin) {
       this.paneAttributes.rotations.y = upRot
       this.paneAttributes.rotations.x = sideRot
       this.paneAttributes.rotations.z = z
       this.paneAttributes.rotations.spin = spin
-      this.paneStyle.transform = `perspective(${this.paneAttributes.rotations.perspective}px)
-      rotateY(${sideRot}deg) rotateX(${upRot}deg) rotateZ(${spin}deg) translateZ(${z}px)`
+      this.setRotations()
     },
-    setBackgrounds() {
+    setRotations() {
+      this.paneStyle.transform = `perspective(${this.paneAttributes.rotations.perspective}px)
+      rotateY(${this.paneAttributes.rotations.x}deg) rotateX(${this.paneAttributes.rotations.y}deg) 
+      rotateZ(${this.paneAttributes.rotations.spin}deg) translateZ(${this.paneAttributes.rotations.z}px)`
+    },
+    updateColors(r, g, b, o) {
+      this.paneAttributes.colors.red = r
+      this.paneAttributes.colors.green = g
+      this.paneAttributes.colors.blue = b
+      this.paneAttributes.colors.opacity = o
+      this.setColors()
+    },
+    setColors() {
       const backStr = `rgba(${this.paneAttributes.colors.red},${this.paneAttributes.colors.green},${this.paneAttributes.colors.blue}, ${this.paneAttributes.colors.opacity})`
     //   const backStr = `rgb(${this.paneAttributes.colors.red},${this.paneAttributes.colors.green},${this.paneAttributes.colors.blue})`
       const borderStr = `rgb(${this.paneAttributes.colors.red * 1.5}, ${this.paneAttributes.colors.green * 1.5}, ${this.paneAttributes.colors.blue * 1.5})`
       this.paneStyle.background = backStr
       this.paneStyle.border = `3px solid ${borderStr}`
     },
-    setLocation(t, l) {
+    updatePosition(t, l) {
       this.paneAttributes.position.top = t
       this.paneAttributes.position.left = l
-      this.paneStyle.top = `${t}px`
-      this.paneStyle.left = `${l}px`
+      this.setPosition()
+    },
+    setPosition() {
+      this.paneStyle.top = `${this.paneAttributes.position.top}px`
+      this.paneStyle.left = `${this.paneAttributes.position.left}px`
     },
     setOffset(e) {
       // console.log('movin')
@@ -152,22 +171,22 @@ export default {
         document.addEventListener('dblclick', this.removeListener)
         if (e.ctrlKey && e.shiftKey) {
             console.log('both keys')
-            this.shifDown = true
-            this.ctrlDown = true
             if (!this.rotateStart.set) {
-                this.rotateStart.set = true
-                this.rotateStart.z = e.clientX
+              this.shifDown = true
+              this.ctrlDown = true
+              this.rotateStart.set = true
+              this.rotateStart.z = e.clientX
             }
             this.rotatePos = {
-                x: this.rotatePos.x,
-                y: this.rotatePos.y,
-                z: e.clientX,
-                spin: this.rotatePos.spin
+              x: this.rotatePos.x,
+              y: this.rotatePos.y,
+              z: e.clientX,
+              spin: this.rotatePos.spin
             }
         }
         else if (e.ctrlKey) {
-          this.ctrlDown = true
           if (!this.rotateStart.set) {
+            this.ctrlDown = true
             this.rotateStart.set = true
             this.rotateStart.x = e.clientX
             this.rotateStart.y = e.clientY
@@ -179,8 +198,8 @@ export default {
             spin: this.rotatePos.spin
           }
         } else if (e.shiftKey) {
-          this.shiftDown = true
           if (!this.rotateStart.set) {
+            this.shiftDown = true
             this.rotateStart.set = true
             this.rotateStart.spin = e.clientX
           }
@@ -191,7 +210,51 @@ export default {
             spin: e.clientX
           }
         }
+      } else if (e.altKey) {
+        document.addEventListener('keyup', this.removeListener)
+        this.div.removeEventListener("mouseup", this.removeListener)
+        if (!this.altDown) {
+          this.altDown = true
+        }
+        // if (!this.sizeStart.set) {
+        //   this.sizeStart.set = true
+        //   this.sizeStart.x = e.clientX
+        //   this.sizeStart.y = e.clientY
+        // } else {
+          // console.log(this.sizeStart.x, e.clientX)
+          let xDir = this.sizeDirection.x
+          let yDir = this.sizeDirection.y
+
+          if (e.clientX > this.sizeStart.x && this.sizeDirection.x <= 0) {
+            xDir = 1
+          } else if (e.clientX < this.sizeStart.x && this.sizeDirection.x >= 0) {
+            xDir = -1
+          } else if (e.clientX == this.sizeStart.x && this.sizeDirection.x != 0) {
+            xDir = 0
+          }
+          
+          if (e.clientY > this.sizeStart.y && this.sizeDirection.y <= 0) {
+            yDir = 1
+          } else if (e.clientY < this.sizeStart.y && this.sizeDirection.y >= 0) {
+            yDir = -1
+          } else if (e.clientY == this.sizeStart.y && this.sizeDirection.y != 0) {
+            yDir = 0
+          }
+
+          this.sizeStart.y = e.clientY
+          this.sizeStart.x = e.clientX
+          this.sizeDirection = {
+            x: xDir,
+            y: yDir
+          }
+        // this.sizePos = {
+        //   x: e.clientX * .25,
+        //   y: e.clientY * .25
+        // }
+        // }
+      
       } else {
+        this.div.addEventListener("mouseup", this.removeListener)
         this.mousePos = {
           x: e.clientX,
           y: e.clientY
@@ -202,6 +265,7 @@ export default {
       e.cancelBubble = true
       console.log('removing listener')
       this.rotateStart.set = false
+      this.sizeStart.set = false
       document.removeEventListener('mousemove', this.mouseListener)
       document.removeEventListener('dblclick', this.removeListener)
       if (this.ctrlDown || this.shiftDown) {
@@ -221,26 +285,29 @@ export default {
       }
       this.ctrlDown = false
       this.shiftDown = false
+      this.altDown = false  
     },
     updateActive(e){
-      console.log('dbl clicked')
-      e.cancelBubble = true
-      this.$store.commit('updateActive', this.paneAttributes)
+      if (e) {
+        console.log('dbl clicked')
+        e.cancelBubble = true
+      }
+      const activePane = {
+        id: this.id,
+        attributes: this.paneAttributes,
+        methods: {
+          updatePosition: this.updatePosition,
+          updateSize: this.updateSize,
+          updateRotations: this.updateRotations,
+          updateColors: this.updateColors
+        }
+      }
+      if (this.paneType == 'pane') {
+          this.$store.commit('updateActive', activePane)
+      } else {
+        this.$store.commit('updateActiveHolder', activePane)
+      }
     }
-
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-div{
-  position: absolute;
-  color: white;
-  font-weight: bolder;
-}
-
-.active {
-  box-shadow: 0 0 5px 0 rgba(255, 215, 0, 0.8), 0 0 5px 0 rgba(255, 215, 0, 0.8);
-}
-</style>

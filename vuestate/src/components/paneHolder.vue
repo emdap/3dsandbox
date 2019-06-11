@@ -1,10 +1,10 @@
 <template>
-    <div :id="`paneHolder${id}`" :style="paneStyle" :class="['paneHolder', id == $store.state.activePane.id ? 'active' : 'default']">
+    <div :id="id" :style="paneStyle" :class="['paneHolder', id == $store.state.activePaneHolder.id ? 'active' : 'default']">
       <div class='addPane' v-on:click="addPane">
         +
       </div>
       {{id}}
-      <pane v-for="(pane, index) in internalPanes" :id="pane.id" :key="index"/>
+      <slot></slot>
     </div>
 </template>
 
@@ -16,35 +16,52 @@ import pane from '@/components/pane.vue'
     components: {
       pane
     },
+    data() {
+      return {
+        // internalPanes: []
+      }
+    },
     mixins: [paneBase],
     mounted: function () {
-      this.setTypeDefaults()
-      this.div = document.getElementById(`paneHolder${this.id}`)
       this.setBaseDefaults()
+      this.setTypeDefaults()
+      this.updateActive(false)
     },
     methods: {
       setTypeDefaults() {
         console.log('i am a holder')
-        this.paneAttributes.size = {
-          height: 500,
-          width: 500
-        }      
-        this.paneAttributes.colors = {
-          red: 250,
-          green: 250,
-          blue: 255,
-          opacity: 1
-        }
+        this.paneAttributes.paneType = 'holder'
         this.paneAttributes.rotations.perspective = 600
       },
-      addPane(e){
+      addPane(customAtts=false){
         console.log('adding pane')
-        const pane = {
-          holderId: this.id,
-          id: `pane${this.$store.state.panes.length + 1}`
+        const payload = {
+          attributes: {
+            rotations: {
+              x: 0,
+              y: 0,
+              z: 100,
+              spin: 0,
+              perspective: 0
+            },
+            size: {
+              height: 100,
+              width: 100
+            },
+            position: {
+              top: 0,
+              left: 0
+            },
+            colors: {
+              red: 255,
+              green: 200,
+              blue: 150,
+              opacity: .9
+            }
+          }
         }
-        this.$store.commit('addPane', pane)
-        this.internalPanes.push(pane)
+        this.$store.commit('addPane', payload)
+        // this.internalPanes.push(pane)
       }
     }
   }
@@ -64,10 +81,17 @@ import pane from '@/components/pane.vue'
 }
 
 .paneHolder {
+  position: absolute;
   color: black !important;
   border: 1px solid black !important;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   overflow: visible !important;
 }
+
+.paneHolder.active {
+  box-shadow: 0 0 5px 0 rgba(0, 215, 255, 0.8), 0 0 5px 0 rgba(0, 215, 255, 0.8);
+}
+
+
 </style>
