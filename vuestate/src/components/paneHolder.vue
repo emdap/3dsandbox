@@ -10,55 +10,28 @@
 
 <script>
 import paneBase from '@/components/paneBase.vue'
-import pane from '@/components/pane.vue'
 
   export default {
-    components: {
-      pane
-    },
-    data() {
-      return {
-        // internalPanes: []
-      }
-    },
+    // data() {
+    //   return {
+    //     internalPanes: []
+    //   }
+    // },
     mixins: [paneBase],
     mounted: function () {
+      this.paneType = 'holder'
       this.setBaseDefaults()
       this.setTypeDefaults()
-      this.updateActive(false)
     },
     methods: {
       setTypeDefaults() {
         console.log('i am a holder')
-        this.paneAttributes.paneType = 'holder'
         this.paneAttributes.rotations.perspective = 600
       },
-      addPane(customAtts=false){
+      addPane(){
         console.log('adding pane')
         const payload = {
-          attributes: {
-            rotations: {
-              x: 0,
-              y: 0,
-              z: 100,
-              spin: 0,
-              perspective: 0
-            },
-            size: {
-              height: 100,
-              width: 100
-            },
-            position: {
-              top: 0,
-              left: 0
-            },
-            colors: {
-              red: 255,
-              green: 200,
-              blue: 150,
-              opacity: .9
-            }
-          }
+          holderId: this.id
         }
         this.$store.commit('addPane', payload)
         // this.internalPanes.push(pane)
@@ -87,6 +60,7 @@ import pane from '@/components/pane.vue'
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   overflow: visible !important;
+  transition: transform .2s, background .5s, height .2s, width .2s, line-height .2s;
 }
 
 .paneHolder.active {

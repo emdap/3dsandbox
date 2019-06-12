@@ -8,15 +8,19 @@
 import paneBase from '@/components/paneBase.vue'
 export default {
   name: 'Pane',
+  // data() {
+  //   return {
+  //     holderId: 0
+  //   }
+  // },
   mixins: [paneBase],
   mounted: function() {
+    this.paneType = 'pane'
     this.setBaseDefaults()
     this.setTypeDefaults()
-    this.setColors()
   },
   methods: {
     setTypeDefaults() {
-      this.paneAttributes.paneType = 'pane'
     }
   }
 }
@@ -28,6 +32,7 @@ div{
   position: absolute;
   color: white;
   font-weight: bolder;
+  transition:  transform .2s, background .5s, height .2s, width .2s;
 }
 
 .active {

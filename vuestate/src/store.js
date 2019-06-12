@@ -1,27 +1,25 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {paneDefaults, holderDefaults} from './defaults'
+const _ = require('lodash')
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    activePane: {},
+    activePane: false,
     panes: [],
-    activePaneHolder: {},
+    activePaneHolder: false,
     paneHolders: [],
   },
   mutations: {
     updateActive (state, pane) {
       state.activePane = pane
-      console.log(`active pane is ${pane.id}`)
-      console.log(pane)
     },
     addPane (state, payload) {
       const pane = {
         holderId: payload.holderId,
         id: `pane${state.panes.length + 1}`,
-        paneAttributes: payload.attributes
+        customAtts: payload.customAtts
       }
       // pane.paneAttributes = payload.customAtts ? payload.customAtts : paneDefaults
       state.panes.push(pane)
@@ -29,33 +27,50 @@ export default new Vuex.Store({
         return x.id == pane.holderId;
       })
       holder.internalPanes.push(pane)
-      console.log(holder.internalPanes)
     },
-    addPaneHolder (state, attributes) {
+    addPaneHolder (state, payload) {
       let paneHolder = {
         id: `holder${state.paneHolders.length + 1}`,
-        internalPanes: [],
-        paneAttributes: attributes
+        internalPanes: []
       }
-      // paneHolder.paneAttributes = customAtts ? customAtts : holderDefaults
-      console.log(paneHolder.paneAttributes.position.top)
+      if (payload) {
+        if (payload.customAtts) {
+          paneHolder.customAtts = payload.customAtts
+        }
+        if (payload.internalPanes) {
+          paneHolder.internalPanes = payload.internalPanes
+        }
+      }
       state.paneHolders.push(paneHolder)
     },
     updateActiveHolder (state, paneHolder) {
       state.activePaneHolder = paneHolder
-      console.log(`active pane holder is ${paneHolder.id}`)
-      console.log(paneHolder)
     },
     updateHolderAtts(state, newAtts) {
       const holder = state.paneHolders.find( x => {
         return x.id == state.activePane.id
       })
-      console.log(newAtts)
       holder.paneAttributes = newAtts
-      console.log(state.paneHolders)
     }
   },
   actions: {
-
+    duplicatePane({commit}, pane) {
+      const payload = {
+        holderId: pane.holderId,
+        customAtts: _.cloneDeep(pane.attributes)
+      }
+      commit('addPane', payload)
+    },
+    duplicateHolder({state, commit}, holder) {
+      const stateHolder = state.paneHolders.find(x => {
+        return x.id = holder.id
+      })
+      const payload = {
+        customAtts: _.cloneDeep(holder.attributes),
+        internalPanes: _.cloneDeep(stateHolder.internalPanes)
+      }
+      console.log(payload.internalPanes)
+      commit('addPaneHolder', payload)
+    }
   }
 })

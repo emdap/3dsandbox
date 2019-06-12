@@ -1,4 +1,5 @@
 <template>
+<div/>
 </template>
 
 <script>
@@ -6,7 +7,8 @@ export default {
   name: 'PaneBase',
   props: {
     id: String,
-    paneAttributes: Object
+    customAtts: Object,
+    holderId: String
   },
   data() {
       return {
@@ -66,7 +68,8 @@ export default {
           border: '',
           transform: '',
           'line-height': ''
-        }
+        },
+        paneAttributes: {}
     }
   },
   watch: {
@@ -89,21 +92,78 @@ export default {
       const spin = this.angleStart.spin + this.rotatePos.spin - this.rotateStart.spin
       // rotating after transforming or vice versa will have glitchy effect
       // due to rotating changing the location of the axis of which the transform takes place
-      console.log(zDist)
-      this.updateRotations(xRot, yRot, zDist, spin)
+      this.updateRotation(xRot, yRot, zDist, spin, this.paneAttributes.rotations.perspective)
     }
   },
   methods: {
     setBaseDefaults() {
       this.div = document.getElementById(this.id)
-      console.log(this.paneAttributes)
-      console.log(this.id)
+      this.setAtts()
       this.setRotations()
       this.setSize()
       this.setPosition()
-      console.log('hello')
+      this.setColors()
+      this.setZIndex()
+      this.updateActive(false)
       this.div.addEventListener("dblclick", this.updateActive)
       this.div.addEventListener("mousedown", this.setOffset)
+    },
+    setAtts() {
+      if (this.customAtts) {
+        this.paneAttributes = this.customAtts
+      } else {
+        if (this.paneType == 'holder') {
+          this.paneAttributes = {
+            rotations: {
+              x: 0,
+              y: 0,
+              z: 0,
+              spin: 0,
+              perspective: 600
+            },
+            size: {
+              height: 500,
+              width: 500
+            },
+            position: {
+              top: 0,
+              left: 0
+            },
+            colors: {
+              red: 250,
+              green: 250,
+              blue: 255,
+              opacity: 0
+            },
+            zIndex: 1
+          }
+        } else if (this.paneType == 'pane') {
+          this.paneAttributes = {
+            rotations: {
+              x: 0,
+              y: 0,
+              z: 0,
+              spin: 0,
+              perspective: 0
+            },
+            size: {
+              height: 100,
+              width: 100
+            },
+            position: {
+              top: 100,
+              left: 100
+            },
+            colors: {
+              red: 255,
+              green: 200,
+              blue: 150,
+              opacity: .9
+            },
+            zIndex: 1
+          }
+        }
+      }
     },
     updateSize(h, w) {
       this.paneAttributes.size.height = h
@@ -115,11 +175,12 @@ export default {
       this.paneStyle.width = `${this.paneAttributes.size.width}px`
       this.paneStyle['line-height'] = `${this.paneAttributes.size.height}px`
     },
-    updateRotations(sideRot, upRot, z, spin) {
-      this.paneAttributes.rotations.y = upRot
+    updateRotation(sideRot, upRot, z, spin, p) {
       this.paneAttributes.rotations.x = sideRot
+      this.paneAttributes.rotations.y = upRot
       this.paneAttributes.rotations.z = z
       this.paneAttributes.rotations.spin = spin
+      this.paneAttributes.rotations.perspective = p
       this.setRotations()
     },
     setRotations() {
@@ -127,7 +188,7 @@ export default {
       rotateY(${this.paneAttributes.rotations.x}deg) rotateX(${this.paneAttributes.rotations.y}deg) 
       rotateZ(${this.paneAttributes.rotations.spin}deg) translateZ(${this.paneAttributes.rotations.z}px)`
     },
-    updateColors(r, g, b, o) {
+    updateColor(r, g, b, o) {
       this.paneAttributes.colors.red = r
       this.paneAttributes.colors.green = g
       this.paneAttributes.colors.blue = b
@@ -150,6 +211,13 @@ export default {
       this.paneStyle.top = `${this.paneAttributes.position.top}px`
       this.paneStyle.left = `${this.paneAttributes.position.left}px`
     },
+    updateZIndex(zIndex) {
+      this.paneAttributes.zIndex = Math.max(zIndex, 1)
+      this.setZIndex()
+    },
+    setZIndex() {
+      this.paneStyle['z-index'] = this.paneAttributes.zIndex
+    },
     setOffset(e) {
       // console.log('movin')
       // this.$store.commit('updateMouseDown', true)
@@ -165,10 +233,10 @@ export default {
     mouseListener(e) {
       e.preventDefault()
       e.cancelBubble = true
+      document.addEventListener('dblclick', this.removeListener)
       if (e.ctrlKey || e.shiftKey) {
         document.addEventListener('keyup', this.removeListener)
-        document.addEventListener('mouseup', this.removeListener)
-        document.addEventListener('dblclick', this.removeListener)
+        // document.addEventListener('mouseup', this.removeListener)
         if (e.ctrlKey && e.shiftKey) {
             console.log('both keys')
             if (!this.rotateStart.set) {
@@ -212,7 +280,7 @@ export default {
         }
       } else if (e.altKey) {
         document.addEventListener('keyup', this.removeListener)
-        this.div.removeEventListener("mouseup", this.removeListener)
+        document.removeEventListener("mouseup", this.removeListener)
         if (!this.altDown) {
           this.altDown = true
         }
@@ -254,14 +322,14 @@ export default {
         // }
       
       } else {
-        this.div.addEventListener("mouseup", this.removeListener)
+        document.addEventListener("mouseup", this.removeListener)
         this.mousePos = {
           x: e.clientX,
           y: e.clientY
         }
       }
     },
-    removeListener(e){
+    removeListener(e, key=false){
       e.cancelBubble = true
       console.log('removing listener')
       this.rotateStart.set = false
@@ -298,12 +366,14 @@ export default {
         methods: {
           updatePosition: this.updatePosition,
           updateSize: this.updateSize,
-          updateRotations: this.updateRotations,
-          updateColors: this.updateColors
+          updateRotation: this.updateRotation,
+          updateColor: this.updateColor,
+          updateZIndex: this.updateZIndex
         }
       }
       if (this.paneType == 'pane') {
-          this.$store.commit('updateActive', activePane)
+        activePane.holderId = this.holderId
+        this.$store.commit('updateActive', activePane)
       } else {
         this.$store.commit('updateActiveHolder', activePane)
       }
