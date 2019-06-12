@@ -16,7 +16,7 @@ import pane from '@/components/pane.vue'
 import controller from '@/components/controller.vue'
 
 export default {
-  name: 'home',
+  name: 'Home',
   components: {
     paneHolder,
     pane,

@@ -12,6 +12,7 @@
 import paneBase from '@/components/paneBase.vue'
 
   export default {
+    name: 'PaneHolder',
     // data() {
     //   return {
     //     internalPanes: []

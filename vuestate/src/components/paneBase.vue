@@ -83,15 +83,14 @@ export default {
     mousePos: function() {
       const top = this.mousePos.y + this.mouseOffset.y
       const left = this.mousePos.x + this.mouseOffset.x
-      this.updatePosition(top, left)
+      const zIndex = this.paneAttributes.position.zIndex
+      this.updatePosition(top, left, zIndex)
     },
     rotatePos: function() {
       const xRot = this.angleStart.x + this.rotatePos.x - this.rotateStart.x
       const yRot = this.angleStart.y + this.rotatePos.y - this.rotateStart.y
       const zDist = this.angleStart.z + this.rotatePos.z - this.rotateStart.z
       const spin = this.angleStart.spin + this.rotatePos.spin - this.rotateStart.spin
-      // rotating after transforming or vice versa will have glitchy effect
-      // due to rotating changing the location of the axis of which the transform takes place
       this.updateRotation(xRot, yRot, zDist, spin, this.paneAttributes.rotations.perspective)
     }
   },
@@ -103,10 +102,19 @@ export default {
       this.setSize()
       this.setPosition()
       this.setColors()
-      this.setZIndex()
+      // this.setZIndex()
       this.updateActive(false)
+      this.addActivate()
       this.div.addEventListener("dblclick", this.updateActive)
       this.div.addEventListener("mousedown", this.setOffset)
+    },
+    addActivate () {
+      const payload = {
+        paneType: this.paneType,
+        id: this.id,
+        updateActive: this.updateActive
+      }
+      this.$store.commit('addActivateMethod', payload)
     },
     setAtts() {
       if (this.customAtts) {
@@ -122,20 +130,21 @@ export default {
               perspective: 600
             },
             size: {
-              height: 500,
-              width: 500
+              height: 250,
+              width: 250
             },
             position: {
               top: 0,
-              left: 0
+              left: 500,
+              zIndex: 1
             },
             colors: {
               red: 250,
               green: 250,
               blue: 255,
               opacity: 0
-            },
-            zIndex: 1
+            }
+            // zIndex: 1
           }
         } else if (this.paneType == 'pane') {
           this.paneAttributes = {
@@ -152,15 +161,16 @@ export default {
             },
             position: {
               top: 100,
-              left: 100
+              left: 100,
+              zIndex: 1
             },
             colors: {
               red: 255,
               green: 200,
               blue: 150,
               opacity: .9
-            },
-            zIndex: 1
+            }
+            // zIndex: 1
           }
         }
       }
@@ -202,21 +212,16 @@ export default {
       this.paneStyle.background = backStr
       this.paneStyle.border = `3px solid ${borderStr}`
     },
-    updatePosition(t, l) {
+    updatePosition(t, l, z) {
       this.paneAttributes.position.top = t
       this.paneAttributes.position.left = l
+      this.paneAttributes.position.zIndex = z
       this.setPosition()
     },
     setPosition() {
       this.paneStyle.top = `${this.paneAttributes.position.top}px`
       this.paneStyle.left = `${this.paneAttributes.position.left}px`
-    },
-    updateZIndex(zIndex) {
-      this.paneAttributes.zIndex = Math.max(zIndex, 1)
-      this.setZIndex()
-    },
-    setZIndex() {
-      this.paneStyle['z-index'] = this.paneAttributes.zIndex
+      this.paneStyle['z-index'] = this.paneAttributes.position.zIndex
     },
     setOffset(e) {
       // console.log('movin')
@@ -227,7 +232,7 @@ export default {
     },
     addListener(e){
       e.cancelBubble = true
-      console.log('adding listener')
+      // console.log('adding listener')
       document.addEventListener('mousemove', this.mouseListener)
     },
     mouseListener(e) {
@@ -238,12 +243,14 @@ export default {
         document.addEventListener('keyup', this.removeListener)
         // document.addEventListener('mouseup', this.removeListener)
         if (e.ctrlKey && e.shiftKey) {
-            console.log('both keys')
+            this.shiftDown = true
+            this.ctrlDown = true
             if (!this.rotateStart.set) {
-              this.shifDown = true
+              this.shiftDown = true
               this.ctrlDown = true
               this.rotateStart.set = true
               this.rotateStart.z = e.clientX
+              // this.rotate
             }
             this.rotatePos = {
               x: this.rotatePos.x,
@@ -259,6 +266,7 @@ export default {
             this.rotateStart.x = e.clientX
             this.rotateStart.y = e.clientY
           }
+          console.log(this.rotatePos)
           this.rotatePos = {
             x: e.clientX,
             y: e.clientY,
@@ -271,6 +279,7 @@ export default {
             this.rotateStart.set = true
             this.rotateStart.spin = e.clientX
           }
+          console.log(this.rotatePos)
           this.rotatePos = {
             x: this.rotatePos.x,
             y: this.rotatePos.y,
@@ -284,12 +293,6 @@ export default {
         if (!this.altDown) {
           this.altDown = true
         }
-        // if (!this.sizeStart.set) {
-        //   this.sizeStart.set = true
-        //   this.sizeStart.x = e.clientX
-        //   this.sizeStart.y = e.clientY
-        // } else {
-          // console.log(this.sizeStart.x, e.clientX)
           let xDir = this.sizeDirection.x
           let yDir = this.sizeDirection.y
 
@@ -315,11 +318,6 @@ export default {
             x: xDir,
             y: yDir
           }
-        // this.sizePos = {
-        //   x: e.clientX * .25,
-        //   y: e.clientY * .25
-        // }
-        // }
       
       } else {
         document.addEventListener("mouseup", this.removeListener)
@@ -331,7 +329,7 @@ export default {
     },
     removeListener(e, key=false){
       e.cancelBubble = true
-      console.log('removing listener')
+      // console.log('removing listener')
       this.rotateStart.set = false
       this.sizeStart.set = false
       document.removeEventListener('mousemove', this.mouseListener)
