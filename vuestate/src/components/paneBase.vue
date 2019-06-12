@@ -88,10 +88,21 @@ export default {
       this.updatePosition(top, left, zIndex)
     },
     rotatePos: function() {
-      const xRot = this.angleStart.x + this.rotatePos.x - this.rotateStart.x
-      const yRot = this.angleStart.y + this.rotatePos.y - this.rotateStart.y
-      const zDist = this.angleStart.z + this.rotatePos.z - this.rotateStart.z
-      const spin = this.angleStart.spin + this.rotatePos.spin - this.rotateStart.spin
+      let xRot, yRot, zDist, spin
+      if (this.ctrlDown) {
+        xRot = this.angleStart.x + this.rotatePos.x - this.rotateStart.x
+        yRot = this.angleStart.y + this.rotatePos.y - this.rotateStart.y
+        zDist = this.angleStart.z + this.rotatePos.z - this.rotateStart.z
+      } else {
+        xRot = this.paneAttributes.rotations.x
+        yRot = this.paneAttributes.rotations.y
+        zDist = this.paneAttributes.rotations.z
+      }
+      if (this.shiftDown) {
+        spin = this.angleStart.spin + this.rotatePos.spin - this.rotateStart.spin
+      } else {
+        spin = this.paneAttributes.rotations.spin
+      }
       this.updateRotation(xRot, yRot, zDist, spin, this.paneAttributes.rotations.perspective)
     }
   },
@@ -269,13 +280,14 @@ export default {
             }
         }
         else if (e.ctrlKey) {
+          this.ctrlDown = true
           if (!this.rotateStart.set) {
             this.ctrlDown = true
             this.rotateStart.set = true
             this.rotateStart.x = e.clientX
             this.rotateStart.y = e.clientY
           }
-          console.log(this.rotatePos)
+          // console.log(this.rotatePos.spin)
           this.rotatePos = {
             x: e.clientX,
             y: e.clientY,
@@ -283,12 +295,13 @@ export default {
             spin: this.rotatePos.spin
           }
         } else if (e.shiftKey) {
+          this.shiftDown = true
           if (!this.rotateStart.set) {
             this.shiftDown = true
             this.rotateStart.set = true
             this.rotateStart.spin = e.clientX
           }
-          console.log(this.rotatePos)
+          // console.log(this.rotatePos.spin)
           this.rotatePos = {
             x: this.rotatePos.x,
             y: this.rotatePos.y,
