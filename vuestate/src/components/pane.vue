@@ -1,6 +1,9 @@
 <template>
   <div :id="id" :style="paneStyle" :class="id == $store.state.activePane.id ? 'active' : 'default'">
-    {{id}}
+      <div class='removePane' v-on:click="removePane">
+        -
+      </div>
+      {{id}}
   </div>
 </template>
 
@@ -33,6 +36,16 @@ div{
   color: white;
   font-weight: bolder;
   transition:  transform .2s, background .5s, height .2s, width .2s;
+}
+
+.removePane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 1rem;
+  line-height: 1rem !important;
 }
 
 .active {

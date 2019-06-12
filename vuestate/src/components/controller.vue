@@ -12,74 +12,6 @@
         {{showHolderControls ? "hide holder controls" : "show holder controls"}}
       </button>
       <controlTable v-if="showHolderControls" paneType="holder"/>
-    <!-- <table v-if="showHolderControls">
-      <tr>
-        <th>field</th>
-        <th>value</th>
-        <th>new</th>
-        <th>inc</th>
-        <th>set</th>
-      </tr>
-      <tr v-for="(value, key) in holderVals.attributes.rotations" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newHolderRotation[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateRotation('holder', item, key, newHolderRotation)">
-            +
-          </button>
-        </td>
-      </tr>
-      <tr v-for="(value, key) in holderVals.attributes.size" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newHolderSize[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateSize('holder', item, key, newHolderSize)">
-            +
-          </button>
-        </td>
-      </tr>
-       <tr v-for="(value, key) in holderVals.attributes.position" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newHolderPosition[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updatePosition('holder', item, key, newHolderPosition)">
-            +
-          </button>
-        </td>
-      </tr>
-       <tr v-for="(value, key) in holderVals.attributes.colors" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newHolderColor[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateColor('holder', item, key, newHolderColor)">
-            +
-          </button>
-        </td>
-      </tr>
-        <td>z index</td>
-        <td>{{holderVals.attributes.zIndex}}</td>
-        <td>
-          <input v-model="newHolderZIndex"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateZIndex('holder', item)">
-            +
-          </button>
-        </td>
-      </tr>
-    </table> -->
     </div>
 
     <div id="paneControls" class="controllHolder" v-if="$store.state.activePane">
@@ -91,74 +23,6 @@
         {{showPaneControls ? "hide pane controls" : "show pane controls"}}
       </button>
       <controlTable v-if="showPaneControls" paneType="pane"/>
-    <!-- <table v-if="showPaneControls">
-      <tr>
-        <th>field</th>
-        <th>value</th>
-        <th>new</th>
-        <th>increment</th>
-        <th>set</th>
-      </tr>
-      <tr v-for="(value, key) in paneVals.attributes.rotations" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newPaneRotation[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateRotation('pane', item)">
-            +
-          </button>
-        </td>
-      </tr>
-      <tr v-for="(value, key) in paneVals.attributes.size" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newPaneSize[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateSize('pane', item)">
-            +
-          </button>
-        </td>
-      </tr>
-       <tr v-for="(value, key) in paneVals.attributes.position" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newPanePosition[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updatePosition('pane', item)">
-            +
-          </button>
-        </td>
-      </tr>
-       <tr v-for="(value, key) in paneVals.attributes.colors" :key="key">
-        <td>{{key}}</td>
-        <td>{{value}}</td>
-        <td>
-          <input v-model="newPaneColor[key]"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateColor('pane', item)">
-            +
-          </button>
-        </td>
-      </tr>
-        <td>z index</td>
-        <td>{{paneVals.attributes.zIndex}}</td>
-        <td>
-          <input v-model="newPaneZIndex"/>
-        </td>
-        <td v-for="(item, index) in ['inc', 'set']" :key="index">
-          <button v-on:click="updateZIndex('pane', item)">
-            +
-          </button>
-        </td>
-      </tr>
-    </table> -->
     </div>
   </div>
 </template>
@@ -232,10 +96,8 @@ import controlTable from '@/components/controlTable'
         this.$store.dispatch('duplicatePane', this.$store.state.activePane)
       },
       addPaneHolder: function () {
-        console.log('adding')
         const customAtts = false
         this.$store.commit('addPaneHolder', customAtts)
-        console.log(this.$store.state.paneHolders)
       }
     }
   }

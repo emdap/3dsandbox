@@ -10,6 +10,8 @@ export default new Vuex.Store({
     panes: [],
     activePaneHolder: false,
     paneHolders: [],
+    totalPanes: 0,
+    totalHolders: 0
   },
   mutations: {
     updateActive (state, pane) {
@@ -18,9 +20,10 @@ export default new Vuex.Store({
     addPane (state, payload) {
       const pane = {
         holderId: payload.holderId,
-        id: `pane${state.panes.length + 1}`,
+        id: `pane${state.totalPanes + 1}`,
         customAtts: payload.customAtts
       }
+      state.totalPanes++
       // pane.paneAttributes = payload.customAtts ? payload.customAtts : paneDefaults
       state.panes.push(pane)
       const holder = state.paneHolders.find( x => {
@@ -30,9 +33,10 @@ export default new Vuex.Store({
     },
     addPaneHolder (state, payload) {
       let paneHolder = {
-        id: `holder${state.paneHolders.length + 1}`,
+        id: `holder${state.totalHolders + 1}`,
         internalPanes: []
       }
+      state.totalHolders++
       if (payload) {
         if (payload.customAtts) {
           paneHolder.customAtts = payload.customAtts
@@ -63,6 +67,34 @@ export default new Vuex.Store({
         return x.id == payload.id
       })
       pane.activate = payload.updateActive
+    },
+    removePane(state, pane) {
+      state.panes = state.panes.filter(x => {
+        return x.id != pane.id
+      })
+      const holder = state.paneHolders.find( x => {
+        return x.id == pane.holderId;
+      })
+      holder.internalPanes = holder.internalPanes.filter(x => {
+        return x.id != pane.id
+      })
+    },
+    removeHolder(state, paneId) {
+      state.paneHolders = state.paneHolders.filter(x => {
+        return x.id != paneId
+      })
+    },
+    updateCustomAtts(state, payload) {
+      let paneList
+      if (payload.paneType == 'pane') {
+        paneList = state.panes
+      } else {
+        paneList = state.paneHolders
+      }
+      let pane = paneList.find(x => {
+        return x.id == payload.id
+      })
+      pane.customAtts = payload.attributes
     }
   },
   actions: {
@@ -75,21 +107,28 @@ export default new Vuex.Store({
     },
     duplicateHolder({state, commit}, holder) {
       const stateHolder = state.paneHolders.find(x => {
-        return x.id = holder.id
+        return x.id == holder.id
       })
-      const duplicate = {
-        customAtts: _.cloneDeep(holder.attributes),
-        internalPanes: []
+      let duplicate = {
+        id: `holder${state.totalHolders + 1}`,
+        customAtts: _.cloneDeep(holder.attributes)
       }
-      for (let pane in stateHolder.internalPanes) { 
-        let duplicatePane = _.cloneDeep(pane)
-        duplicatePane.id = `holder${state.pane.length + 1}`
-        duplicatePane.holderId = `holder${state.paneHolders.length + 1}`
-        duplicate.internalPanes.push(duplicatePane)
-        commit('addPane', duplicatePane)
-      }
-      console.log(duplicate.internalPanes)
       commit('addPaneHolder', duplicate)
+      const stateDuplicate = state.paneHolders.find(x => {
+        return x.id == duplicate.id
+      })
+      let internalDuplicates = []
+      stateHolder.internalPanes.forEach(pane =>  {
+        console.log(pane)
+        let duplicatePane = {}
+        duplicatePane.customAtts = _.cloneDeep(pane.customAtts)
+        duplicatePane.holderId = duplicate.id
+        internalDuplicates.push(duplicatePane)
+        console.log(internalDuplicates)
+      })
+      internalDuplicates.forEach(pane => {
+        commit('addPane', pane)
+      })
     }
   }
 })

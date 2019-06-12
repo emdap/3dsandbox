@@ -2,8 +2,8 @@
   <div>
     <div id="masterHolder">
       <controller/>
-      <paneHolder v-for="(paneHolder, index) in $store.state.paneHolders" :key="index" :id="paneHolder.id" :customAtts="paneHolder.customAtts" paneType="holder">
-        <pane v-for="(pane, index) in paneHolder.internalPanes" :id="pane.id" :key="index" :holderId="pane.holderId" :customAtts="pane.customAtts"/>
+      <paneHolder v-for="paneHolder in $store.state.paneHolders" :key="paneHolder.id" :id="paneHolder.id" :customAtts="paneHolder.customAtts" paneType="holder">
+        <pane v-for="pane in paneHolder.internalPanes" :id="pane.id" :key="pane.id" :holderId="pane.holderId" :customAtts="pane.customAtts"/>
       </paneHolder>
     </div>
   </div>

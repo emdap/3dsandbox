@@ -3,6 +3,9 @@
       <div class='addPane' v-on:click="addPane">
         +
       </div>
+      <div class='removePane' v-on:click="removePane">
+        -
+      </div>
       {{id}}
       <slot></slot>
     </div>
@@ -29,13 +32,13 @@ import paneBase from '@/components/paneBase.vue'
         console.log('i am a holder')
         this.paneAttributes.rotations.perspective = 600
       },
-      addPane(){
+      addPane(e){
+        document.removeEventListener('mousemove', this.mouseListener)
         console.log('adding pane')
         const payload = {
           holderId: this.id
         }
         this.$store.commit('addPane', payload)
-        // this.internalPanes.push(pane)
       }
     }
   }
@@ -47,6 +50,17 @@ import paneBase from '@/components/paneBase.vue'
   position: absolute;
   top: 0;
   right: 0;
+  cursor: pointer;
+  color: black !important;
+  font-size: 1rem;
+  width: 1rem;
+  line-height: 1rem !important;
+}
+
+.removePane {
+  position: absolute;
+  top: 0;
+  left: 0;
   cursor: pointer;
   color: black !important;
   font-size: 1rem;

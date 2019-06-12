@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { setTimeout } from 'timers';
 export default {
   name: 'PaneBase',
   props: {
@@ -134,7 +135,7 @@ export default {
               width: 250
             },
             position: {
-              top: 0,
+              top: 50,
               left: 500,
               zIndex: 1
             },
@@ -173,6 +174,14 @@ export default {
             // zIndex: 1
           }
         }
+        // glitches were due to key on vfor
+        // // update these attributes in the store
+        const payload = {
+          paneType: this.paneType,
+          id: this.id,
+          attributes: this.paneAttributes
+        }
+        this.$store.commit('updateCustomAtts', payload)
       }
     },
     updateSize(h, w) {
@@ -374,6 +383,17 @@ export default {
         this.$store.commit('updateActive', activePane)
       } else {
         this.$store.commit('updateActiveHolder', activePane)
+      }
+    },
+    removePane() {
+      if (this.paneType == 'pane') {
+        const payload = {
+          id: this.id,
+          holderId: this.holderId
+        }
+        this.$store.commit('removePane', payload)
+      } else {
+        this.$store.commit('removeHolder', this.id)
       }
     }
   }
