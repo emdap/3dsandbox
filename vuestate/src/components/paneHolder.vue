@@ -1,10 +1,13 @@
 <template>
-    <div :id="id" :style="paneStyle" :class="['paneHolder', id == $store.state.activePaneHolder.id ? 'active' : 'default']">
+    <div :id="id" :style="paneStyle" :class="['paneHolder', id == $store.state.activePaneHolder.id ? 'active' : 'default', this.spinning ? 'spinning': '']">
       <div class='addPane' v-on:click="addPane">
         +
       </div>
       <div class='removePane' v-on:click="removePane">
         -
+      </div>
+      <div class='addSpin' v-on:click="spinning = !spinning">
+        ~
       </div>
       {{id}}
       <slot></slot>
@@ -44,23 +47,12 @@ import paneBase from '@/components/paneBase.vue'
   }
 </script>
 
-<style scoped>
+<style>
 
 .addPane {
   position: absolute;
   top: 0;
   right: 0;
-  cursor: pointer;
-  color: black !important;
-  font-size: 1rem;
-  width: 1rem;
-  line-height: 1rem !important;
-}
-
-.removePane {
-  position: absolute;
-  top: 0;
-  left: 0;
   cursor: pointer;
   color: black !important;
   font-size: 1rem;

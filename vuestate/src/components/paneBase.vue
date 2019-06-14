@@ -15,6 +15,7 @@ export default {
       return {
         div: '',
         paneType: '',
+        spinning: false,
         ctrlDown: false,
         shiftDown: false,
         altDown: false,
@@ -127,6 +128,9 @@ export default {
         updateActive: this.updateActive
       }
       this.$store.commit('addActivateMethod', payload)
+    },
+    updateSpin () {
+      this.spinning = !this.spinning
     },
     setAtts() {
       if (this.customAtts) {
@@ -388,7 +392,8 @@ export default {
           updateSize: this.updateSize,
           updateRotation: this.updateRotation,
           updateColor: this.updateColor,
-          updateZIndex: this.updateZIndex
+          updateZIndex: this.updateZIndex,
+          updateSpin: this.updateSpin
         }
       }
       if (this.paneType == 'pane') {
@@ -412,3 +417,33 @@ export default {
   }
 }
 </script>
+
+<style>
+.removePane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 1rem;
+  line-height: 1rem !important;
+}
+
+.addSpin {
+  position: absolute;
+  top: calc(50% - .5rem);
+  left: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 1rem;
+}
+
+.spinning {
+  animation: spin-it 8s infinite ease-in-out;
+}
+
+@keyframes spin-it {
+  from {transform: rotateX(0deg) rotateY(0deg) translateZ(100px)}
+  to {transform: rotateX(360deg) rotateY(360deg) translateZ(100px)}
+}
+</style>

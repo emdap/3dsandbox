@@ -3,13 +3,17 @@
     <button id="adder" v-on:click="addPaneHolder">
       Add Pane Holder
     </button>
+    <button id="adder" v-on:click="addHouse" v-if="$store.state.activePaneHolder">
+      Add House
+    </button>
     <div id="holderControls" class="controlHolder" v-if="$store.state.activePaneHolder">
       <div class="controlHeader">
         {{$store.state.activePaneHolder.id}} CONTROL
       </div>
       <button class="duplicate" v-on:click="duplicateHolder">duplicate</button>
+      <button class="duplicate" v-on:click="updateSpin('holder')">spin</button>
       <button class="showControls" v-on:click="showHolderControls = !showHolderControls">
-        {{showHolderControls ? "hide holder controls" : "show holder controls"}}
+        {{showHolderControls ? "hide controls" : "show controls"}}
       </button>
       <controlTable v-if="showHolderControls" paneType="holder"/>
     </div>
@@ -19,8 +23,9 @@
         {{$store.state.activePane.id}} CONTROL
       </div>
       <button class="duplicate" v-on:click="duplicatePane">duplicate</button>
+      <button class="duplicate" v-on:click="updateSpin('pane')">spin</button>
       <button class="showControls" v-on:click="showPaneControls = !showPaneControls">
-        {{showPaneControls ? "hide pane controls" : "show pane controls"}}
+        {{showPaneControls ? "hide controls" : "show controls"}}
       </button>
       <controlTable v-if="showPaneControls" paneType="pane"/>
     </div>
@@ -29,6 +34,8 @@
 
 <script>
 import controlTable from '@/components/controlTable'
+import {house} from '@/defaults.js'
+
   export default {
     name: 'Controller',
     components: {
@@ -36,8 +43,8 @@ import controlTable from '@/components/controlTable'
     },
     data() {
       return {
-        showHolderControls: true,
-        showPaneControls: true, 
+        showHolderControls: false,
+        showPaneControls: false, 
       }
     },
     methods: {
@@ -98,6 +105,23 @@ import controlTable from '@/components/controlTable'
       addPaneHolder: function () {
         const customAtts = false
         this.$store.commit('addPaneHolder', customAtts)
+      },
+      updateSpin: function (paneType) {
+        const [targetOld, targetMethods] = this.makeTargets(paneType, 'rotations')
+        targetMethods.updateSpin()
+      },
+      addHouse: function() {
+        const curHolder = this.$store.state.activePaneHolder.id
+        console.log(curHolder)
+        console.log(house)
+        house.forEach(atts => {
+          console.log(atts)
+          let payload = {
+            holderId: curHolder,
+            customAtts: atts
+          }
+          this.$store.commit('addPane', payload)
+        })
       }
     }
   }

@@ -23,6 +23,7 @@ export default new Vuex.Store({
         id: `pane${state.totalPanes + 1}`,
         customAtts: payload.customAtts
       }
+      console.log(pane)
       state.totalPanes++
       // pane.paneAttributes = payload.customAtts ? payload.customAtts : paneDefaults
       state.panes.push(pane)
