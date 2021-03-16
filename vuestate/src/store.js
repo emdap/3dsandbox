@@ -115,9 +115,9 @@ export default new Vuex.Store({
         customAtts: _.cloneDeep(holder.attributes)
       }
       commit('addPaneHolder', duplicate)
-      const stateDuplicate = state.paneHolders.find(x => {
-        return x.id == duplicate.id
-      })
+      // const stateDuplicate = state.paneHolders.find(x => {
+      //   return x.id == duplicate.id
+      // })
       let internalDuplicates = []
       stateHolder.internalPanes.forEach(pane =>  {
         console.log(pane)

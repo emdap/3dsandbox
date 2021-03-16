@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import { setTimeout } from 'timers';
 export default {
   name: 'PaneBase',
   props: {
@@ -353,7 +352,7 @@ export default {
         }
       }
     },
-    removeListener(e, key=false){
+    removeListener(e){
       e.cancelBubble = true
       // console.log('removing listener')
       this.rotateStart.set = false

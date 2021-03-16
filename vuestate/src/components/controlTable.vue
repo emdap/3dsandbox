@@ -121,6 +121,8 @@
           return this.$store.state.activePaneHolder.attributes
         } else if (this.paneType == 'pane') {
           return this.$store.state.activePane.attributes
+        } else {
+          return null
         }
       }
     },

@@ -1,6 +1,5 @@
 vuestate/node_modules
 vuestate/.vscode
-*.ods
 
 /dist
 

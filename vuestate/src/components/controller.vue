@@ -57,7 +57,7 @@ import {house} from '@/defaults.js'
           targetOld =  this.$store.state.activePane.attributes[attribute]
           targetMethods = this.$store.state.activePane.methods
         } 
-        return [targetOld, targetMethods]
+        return {targetOld, targetMethods}
       },
       makeNewVals(targetNew, targetOld, which, operation) {
         let newVals = {}
@@ -77,22 +77,22 @@ import {house} from '@/defaults.js'
         return newVals
       },
       updateRotation(paneType, operation, which, targetNew) {
-        const [targetOld, targetMethods] = this.makeTargets(paneType, 'rotations')
+        const {targetOld, targetMethods} = this.makeTargets(paneType, 'rotations')
         const newVals = this.makeNewVals(targetNew, targetOld, which, operation)
         targetMethods.updateRotation(newVals.x, newVals.y, newVals.z, newVals.spin, newVals.perspective)
       },
       updateSize(paneType, operation, which, targetNew) {
-        const [targetOld, targetMethods] = this.makeTargets(paneType, 'size')
+        const {targetOld, targetMethods} = this.makeTargets(paneType, 'size')
         const newVals = this.makeNewVals(targetNew, targetOld, which, operation)
         targetMethods.updateSize(newVals.height, newVals.width)
       },
       updatePosition(paneType, operation, which, targetNew) {
-        const [targetOld, targetMethods] = this.makeTargets(paneType, 'position')
+        const {targetOld, targetMethods} = this.makeTargets(paneType, 'position')
         const newVals = this.makeNewVals(targetNew, targetOld, which, operation)
         targetMethods.updatePosition(newVals.top, newVals.left, newVals.zIndex)
       },
       updateColor(paneType, operation, which, targetNew) {
-        const [targetOld, targetMethods] = this.makeTargets(paneType, 'colors')
+        const {targetOld, targetMethods} = this.makeTargets(paneType, 'colors')
         const newVals = this.makeNewVals(targetNew, targetOld, which, operation)
         targetMethods.updateColor(newVals.red, newVals.green, newVals.blue, newVals.opacity)
       },
@@ -107,7 +107,7 @@ import {house} from '@/defaults.js'
         this.$store.commit('addPaneHolder', customAtts)
       },
       updateSpin: function (paneType) {
-        const [targetOld, targetMethods] = this.makeTargets(paneType, 'rotations')
+        const {targetMethods} = this.makeTargets(paneType, 'rotations')
         targetMethods.updateSpin()
       },
       addHouse: function() {

@@ -35,7 +35,7 @@ import paneBase from '@/components/paneBase.vue'
         console.log('i am a holder')
         this.paneAttributes.rotations.perspective = 600
       },
-      addPane(e){
+      addPane(){
         document.removeEventListener('mousemove', this.mouseListener)
         console.log('adding pane')
         const payload = {
